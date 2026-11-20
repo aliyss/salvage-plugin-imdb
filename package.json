@@ -1,0 +1,19 @@
+{
+  "name": "salvage-plugin-imdb",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "An IMDb episode list for Salvage, read from imdb.com on your own computer.",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "build": "bun build src/plugin.ts --target=bun --outfile dist/plugin.js"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "jpeg-js": "^0.4.4"
+  }
+}

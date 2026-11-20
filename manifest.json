@@ -1,0 +1,20 @@
+{
+  "pluginApiVersion": 1,
+  "id": "salvage-plugin-imdb",
+  "name": "IMDb",
+  "version": "0.1.0",
+  "runtime": { "entry": "dist/plugin.js" },
+  "provides": [],
+  "contributes": [
+    {
+      "id": "episodes",
+      "slot": "entry.detail.link.action",
+      "when": { "link.host": ["imdb.com", "m.imdb.com"] },
+      "ui": { "kind": "button", "label": "Episodes", "icon": "list" },
+      "view": "episodes",
+      "command": "episodes",
+      "timeoutMs": 30000
+    }
+  ],
+  "settings": []
+}
