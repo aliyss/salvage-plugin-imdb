@@ -410,6 +410,56 @@ export async function fetchEpisodes(
   };
 }
 
+/** What a link preview needs from a title: its name, its plot and its poster. */
+export type Preview = {
+  title: string | null;
+  description: string | null;
+  imageUrl: string | null;
+};
+
+/** The one query a preview costs, and the fields it reads. */
+function previewQuery(id: string): string {
+  return `query Preview {
+  title(id: ${JSON.stringify(id)}) {
+    id
+    titleText { text }
+    plot { plotText { plainText } }
+    primaryImage { url }
+  }
+}`;
+}
+
+/**
+ * The description and picture of one title, for a link whose page the app read
+ * without either. IMDb's own preview is sparse, so a card is filled from the
+ * title itself: the plot it publishes and its poster.
+ */
+export async function fetchPreview(id: string): Promise<Preview> {
+  const body = await readGraphql(previewQuery(id));
+  const title =
+    isRecord(body) && isRecord(body.data) && isRecord(body.data.title)
+      ? body.data.title
+      : null;
+  if (!title) {
+    throw new PluginError("no_data", "IMDb has no title at that link.");
+  }
+
+  return {
+    title: isRecord(title.titleText)
+      ? cleanText(title.titleText.text, MAX_TITLE)
+      : null,
+    description: cleanText(
+      isRecord(title.plot) && isRecord(title.plot.plotText)
+        ? title.plot.plotText.plainText
+        : null,
+      MAX_DESCRIPTION,
+    ),
+    imageUrl: httpsUrl(
+      isRecord(title.primaryImage) ? title.primaryImage.url : null,
+    ),
+  };
+}
+
 /** One page of the list, as the answer text the app reads. */
 export function episodePage(episodes: Episode[], hasMore: boolean): string {
   return JSON.stringify({ episodes, hasMore });

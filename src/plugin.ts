@@ -1,4 +1,4 @@
-import { episodePage, fetchEpisodes, imdbIdFrom } from "./imdb";
+import { episodePage, fetchEpisodes, fetchPreview, imdbIdFrom } from "./imdb";
 import { PluginError, serve } from "./sdk";
 import { keepStills } from "./still";
 
@@ -64,10 +64,33 @@ async function episodes(
   };
 }
 
+/**
+ * The description and poster of the title an entry links to, answered only for
+ * the fields a page's own preview lacked.
+ */
+async function preview(
+  subject: { link?: { url?: string } | null } | undefined,
+): Promise<{ kind: string; text: string }> {
+  const id = imdbIdFrom(subject?.link?.url);
+  if (!id) {
+    throw new PluginError(
+      "bad_subject",
+      "This entry does not link to an IMDb title.",
+    );
+  }
+  return {
+    kind: "link-preview",
+    text: JSON.stringify(await fetchPreview(id)),
+  };
+}
+
 export default () =>
   serve(async ({ command, params }) => {
     if (command === "episodes") {
       return await episodes(params.subject, params.paging);
+    }
+    if (command === "preview") {
+      return await preview(params.subject);
     }
 
     throw new PluginError("unsupported", `Unknown command ${command}.`);
