@@ -2,12 +2,13 @@
   "pluginApiVersion": 1,
   "id": "salvage-plugin-imdb",
   "name": "IMDb",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "runtime": { "entry": "dist/plugin.js" },
   "provides": [
     {
       "data": "link-preview",
       "command": "preview",
+      "when": { "link.host": ["imdb.com", "m.imdb.com"] },
       "timeoutMs": 12000,
       "settings": []
     }
